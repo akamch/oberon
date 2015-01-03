@@ -72,15 +72,24 @@
 
 ;; --- Preferences ---
 
+(defgroup oberon nil
+  "Major mode for editing Oberon code."
+  :prefix "oberon-"
+  :group 'languages
+  :link '(url-link :tag "Github" "https://github.com/akamch/oberon"))
+
 (defcustom oberon-indent-level 3
-  "Number of spaces for each indentation step")
+  "Number of spaces for each indentation step"
+  :group 'oberon)
 
 (defcustom oberon-auto-indent-flag t
   "If non-nil indent current line when certain words or
-  characters are inserted.")
+  characters are inserted."
+  :group 'oberon)
 
 (defcustom oberon-record-type-suffix "Desc"
-  "Suffix for record type names in `obn-insert-type-skeleton'.")
+  "Suffix for record type names in `obn-insert-type-skeleton'."
+  :group 'oberon)
 
 
 ;; --- Keymap ---
