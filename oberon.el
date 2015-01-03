@@ -36,22 +36,22 @@
 ;; Put this file in a directory where Emacs can find it (`C-h v
 ;; load-path' for more info). Then add the following lines to your
 ;; Emacs initialization file:
- 
+
 ;;    (add-to-list 'auto-mode-alist '("\\.Mod\\'" . oberon-mode))
 ;;    (autoload 'oberon-mode "oberon" nil t)
 ;;    (add-hook 'oberon-mode-hook (lambda () (abbrev-mode t)))
-                
+
 ;; You may want to change the regular expression on the first line if
 ;; your Oberon files do not end with `.Mod'. You can also skip the
 ;; last line if you do not want automatic upcase conversion of
 ;; predefined words.
-    
+
 ;; General Remarks:
- 
+
 ;; Exported names start with `oberon-' of which the names mentioned in
 ;; the major mode convetions start with `oberon-mode'. Private names
 ;; start with `obn-'.
- 
+
 ;; For sake of simplicity certain (sensible) assumptions are made
 ;; about Oberon program texts. If the assuptions are not satisfied
 ;; there is no guarantee that the mode will function properly. The
@@ -107,26 +107,26 @@
     ;; Oberon Menu
     (define-key main-map [menu-bar] (make-sparse-keymap))
     (define-key main-map [menu-bar oberon] (cons "Oberon" main-menu-map))
-    (define-key main-menu-map [trim-enumeration] 
+    (define-key main-menu-map [trim-enumeration]
       '("Trim Enumeration..." . oberon-trim-enumeration))
     (define-key main-menu-map [trim-separator] '("---"))
-    (define-key main-menu-map [templates] 
+    (define-key main-menu-map [templates]
       (cons "Insert Skeleton" skeleton-menu-map))
-    (define-key skeleton-menu-map [procedure] 
+    (define-key skeleton-menu-map [procedure]
       '("Procedure..." . oberon-insert-procedure-skeleton))
-    (define-key skeleton-menu-map [type] 
+    (define-key skeleton-menu-map [type]
       '("Type..." . oberon-insert-type-skeleton))
-    (define-key skeleton-menu-map [module] 
+    (define-key skeleton-menu-map [module]
       '("Module" . oberon-insert-module-skeleton))
     main-map)
   "Keymap in Oberon mode")
 
-(defconst obn-pre-decl-proc 
-  '("ABS" "ASH" "ASSERT" "CAP" "CHR" "COPY" "DEC" "ENTIER" "EXCL" "HALT" 
+(defconst obn-pre-decl-proc
+  '("ABS" "ASH" "ASSERT" "CAP" "CHR" "COPY" "DEC" "ENTIER" "EXCL" "HALT"
     "LEN" "LONG" "MAX" "MIN" "NEW" "ODD" "ORD" "INC" "INCL" "SHORT" "SIZE")
   "The predeclared procedures in Oberon")
 
-(defconst obn-pre-decl-proc-re 
+(defconst obn-pre-decl-proc-re
   (regexp-opt obn-pre-decl-proc 'words)
   "regular expression matching any predeclared procedure")
 
@@ -141,7 +141,7 @@ space or a punctuation character is inserted."
           word)
       (save-excursion
         (backward-word 1)
-        (when (and (save-excursion 
+        (when (and (save-excursion
                      (re-search-forward ".*" p)
                      (setq word (match-string-no-properties 0))
                      (string-match obn-pre-decl-proc-re word))
@@ -176,7 +176,7 @@ line."
 
     ;; Underscores in identifiers are supported by this mode (as a
     ;; trivial extension to Oberon).
-    ;; 
+    ;;
     ;; The syntax class of underscore should really be `symbol' ("_")
     ;; but that makes matching of tokens much more complex as e.g.
     ;; "\\<xyz\\>" matches part of e.g. "_xyz" and "xyz_abc". Defines
@@ -197,7 +197,7 @@ line."
     (while (> count 0)
       (re-search-forward regexp bound)
       (setq parse (parse-partial-sexp saved-point (point)))
-      (cond 
+      (cond
        ((or (nth 4 parse)          ;inside comment
             (when (and (eq (char-before) ?\() (eq (char-after) ?*))
               (forward-char) t))
@@ -206,7 +206,7 @@ line."
           (re-search-forward "\\((\\*\\|\\*)\\)")
           (setq nesting
                 (if (string-match "(\\*" (match-string-no-properties 0))
-                    (1+ nesting) 
+                    (1+ nesting)
                   (1- nesting)))))
        ((nth 3 parse)                   ;inside string
         (re-search-forward
@@ -222,7 +222,7 @@ line."
 `re-search-forward' but treats the buffer as if strings and
 comments have been removed."
   (let ((saved-point (point))
-        (search-expr 
+        (search-expr
          (cond ((null count)
                 '(obn-re-search-forward-inner regexp bound 1))
                ((< count 0)
@@ -244,14 +244,14 @@ comments have been removed."
     (while (> count 0)
       (re-search-backward regexp bound)
       (setq parse (parse-partial-sexp (point-min) (point)))
-      (cond 
+      (cond
        ((nth 4 parse)               ;inside comment
         (setq nesting (nth 4 parse))
         (while (> nesting 0)
           (re-search-backward "\\((\\*\\|\\*)\\)")
           (setq nesting
                 (if (string-match "(\\*" (match-string-no-properties 0))
-                    (1- nesting) 
+                    (1- nesting)
                   (1+ nesting)))))
        ((nth 3 parse) (goto-char (nth 8 parse))) ;inside string
        ((and (eq (char-before) ?\() (eq (char-after) ?*))
@@ -266,7 +266,7 @@ comments have been removed."
 Invokes `re-search-backward' but treats the buffer as if strings
 and comments have been removed."
   (let ((saved-point (point))
-        (search-expr 
+        (search-expr
          (cond ((null count)
                 '(obn-re-search-backward-inner regexp bound 1))
                ((< count 0)
@@ -306,7 +306,7 @@ and comments have been removed."
 (defconst obn-proc-heading-re
   "^[ \t]*PROCEDURE\\>\\s-*\\(([[:word:] \t\n.:]+)\\s-*\\)?\\w")
 
-(defconst obn-module-proc-heading-re 
+(defconst obn-module-proc-heading-re
   (concat obn-proc-heading-re "\\|^[ \t]*MODULE\\>")
   "regular expression matching the start of a (non-forward) procedure
 heading")
@@ -317,7 +317,7 @@ heading")
 
 ;; Covers the case when the identifier starts on a line and the
 ;; procedure takes or returns at least one parameter.
-(defconst obn-font-lock-proc-heading-2-re 
+(defconst obn-font-lock-proc-heading-2-re
   "^[ \t]*\\(\\w+\\)[* \t]*(\\(\\([ \t[:word:].,]\\|(\\*.*?\\*)\\)+:[ \t[:word:].,]+\\(;\\|)[ \t]*[:;]\\)\\|[ \t]*[:;]\\)"
   "regular expression matching part of a procedure heading starting
 from the procedure identifier")
@@ -328,26 +328,26 @@ from the procedure identifier")
 
 ;; Covers the case when the identifier starts on a line and the
 ;; procedure takes or returns at least one parameter.
-(defconst obn-font-lock-exp-proc-heading-2-re 
+(defconst obn-font-lock-exp-proc-heading-2-re
   "^[ \t]*\\(\\w+\\)[ \t]*\\*[ \t]*(\\(\\([ \t[:word:].,]\\|(\\*.*?\\*)\\)+:[ \t[:word:].,]+\\(;\\|)[ \t]*[:;]\\)\\|[ \t]*[:;]\\)"
   "regular expression matching part of an exported procedure starting
 from the procedure identifier")
 
-(defconst obn-reserved-words-re 
+(defconst obn-reserved-words-re
   (regexp-opt obn-reserved-words 'words)
   "regular expression matching any Oberon reserved word")
 
-(defconst obn-basic-types-re 
+(defconst obn-basic-types-re
   (regexp-opt obn-basic-types 'words)
   "regular expression matching any Oberon basic type")
 
-(defconst obn-pre-decl-const-re 
+(defconst obn-pre-decl-const-re
   (regexp-opt obn-pre-decl-const 'words)
   "regular expression matching any predeclared constant")
 
 (defconst obn-indent-re
-  (concat (regexp-opt '("IMPORT" "CONST" "TYPE" "VAR" "CASE" "FOR" "IF" 
-                        "LOOP" "MODULE" "RECORD" "REPEAT" "WHILE" "WITH" 
+  (concat (regexp-opt '("IMPORT" "CONST" "TYPE" "VAR" "CASE" "FOR" "IF"
+                        "LOOP" "MODULE" "RECORD" "REPEAT" "WHILE" "WITH"
                         "END" "UNTIL" "BEGIN" "ELSE" "ELSIF")
                       'words)
           "\\|" obn-forward-decl-re
@@ -356,7 +356,7 @@ from the procedure identifier")
   "regular expressions matching code that affects indentation")
 
 (defvar obn-font-lock-keywords-1
-  (list   
+  (list
    "\\<IMPORT\\>"
    (list obn-font-lock-proc-heading-1-re 1 font-lock-function-name-face)
    (list obn-font-lock-proc-heading-2-re 1 font-lock-function-name-face))
@@ -365,14 +365,14 @@ from the procedure identifier")
 (defun obn-type-point-init ()
   "Initialize point before fontification of type declaration.
 Stores the position where the font locking should resume."
-  (if (and (null (nth 4 (parse-partial-sexp (point-at-bol) 
+  (if (and (null (nth 4 (parse-partial-sexp (point-at-bol)
                                             (point))))
            (save-excursion             ;not inside type decl. section?
              (let ((case-fold-search nil))
                (prog1
                    (obn-re-search-backward obn-indent-re nil t)
                  (while (looking-at "END\\|VAR")
-                   (obn-re-search-backward obn-indent-re 
+                   (obn-re-search-backward obn-indent-re
                                            nil t)))
                (not (looking-at "TYPE\\|RECORD")))))
       (end-of-line)
@@ -398,9 +398,9 @@ Stores the position where the font locking should resume."
    ;; have decided to fontify the entire type designator.
 
    ;; types in type declarations
-   
+
    (list (concat "\\(\\w+\\)[* \t]*=[ \t]*"
-                 (regexp-opt '("ARRAY" "RECORD" "POINTER" "PROCEDURE") 
+                 (regexp-opt '("ARRAY" "RECORD" "POINTER" "PROCEDURE")
                              'words))
          1 font-lock-type-face)
 
@@ -408,7 +408,7 @@ Stores the position where the font locking should resume."
          (list "\\(\\w+\\)[* \t]*=[ \t]*\\([[:word:].]+\\)"
                '(obn-type-point-init)
                '(end-of-line)
-               '(1 font-lock-type-face) 
+               '(1 font-lock-type-face)
                '(2 font-lock-type-face)))
 
    (list "^[ \t]*\\(?:\\<TYPE\\>[ \t]*\\)?\\([[:alpha:]_]\\w*\\)[* \t]*=[ \t]*$"
@@ -432,7 +432,7 @@ Stores the position where the font locking should resume."
    (list "^[ \t]*\\(?:CASE\\>.+?\\<OF\\>[ \t]*\\)?\\(?:|[ \t]*\\)?.+?:[ \t]*[[:word:].]+"
     (list ":[ \t]*\\([[:word:].]+\\)"
                '(if (save-excursion
-                      (and (progn (backward-word 1) 
+                      (and (progn (backward-word 1)
                                   (not (looking-at obn-pre-decl-proc-re)))
                            (let ((case-fold-search nil))
                              (and (obn-re-search-backward obn-indent-re nil t)
@@ -466,17 +466,17 @@ Stores the position where the font locking should resume."
          (list ;; "\\(\\w+\\)[-* \t]*\\(,\\|:[ \t]*\\(ARRAY\\>.+?\\(;\\|$\\)\\)?\\)"
           "\\(\\w+\\)[-* \t]*\\(,\\|:\\([ \t]*ARRAY\\>.+?\\(\\<OF\\>\\|$\\)\\)?\\)"
           '(let ((case-fold-search nil))
-             (if (or (nth 4 (parse-partial-sexp (point-at-bol) 
+             (if (or (nth 4 (parse-partial-sexp (point-at-bol)
                                                 (point)))
                      (looking-at "[ \t[:word:].]+?\\<DO\\>")
-                     (save-excursion 
+                     (save-excursion
                        (obn-re-search-backward obn-indent-re nil t)
                        (looking-at "|\\|CASE\\|WITH")))
                  (end-of-line)
                (beginning-of-line)))
           '(end-of-line)
           '(1 font-lock-variable-name-face)))
-   
+
    ;; identifier list spanning several lines
    (list "\\<[[:alpha:]_]\\w*[-* \t]*,[ \t]*\\($\\|(\\*\\)"
          (list "\\(\\w+\\)[-* \t]*,"
@@ -496,7 +496,7 @@ Stores the position where the font locking should resume."
   "Additional rules for level three font lock.")
 
 (defvar obn-font-lock-keywords-4-diff
-  (list 
+  (list
    (list "\\(\\w+\\)[ \t]*[*-][ \t]*[=:]" 1 font-lock-warning-face 'append)
    (list obn-font-lock-exp-proc-heading-1-re 1 font-lock-warning-face 'append)
    (list obn-font-lock-exp-proc-heading-2-re 1 font-lock-warning-face 'append))
@@ -517,7 +517,7 @@ Stores the position where the font locking should resume."
   (append obn-font-lock-keywords-3
           obn-font-lock-keywords-4-diff)
   "rules for level four font lock")
-      
+
 (defconst obn-font-lock-keywords
   '(obn-font-lock-keywords-1
     obn-font-lock-keywords-2
@@ -534,17 +534,17 @@ Stores the position where the font locking should resume."
 
 (defconst obn-block-begin-re
   (concat "^[ \t]*"
-          (regexp-opt 
-           '("CASE" "FOR" "IF" "LOOP" "REPEAT" "WHILE" "WITH") 
+          (regexp-opt
+           '("CASE" "FOR" "IF" "LOOP" "REPEAT" "WHILE" "WITH")
            'words)
           "\\|.*\\<RECORD\\>"))
 
 (defconst obn-begin-re "^[ \t]*BEGIN\\>")
 
-(defconst obn-block-outdent-re 
+(defconst obn-block-outdent-re
   (concat "^[ \t]*\\(|\\|" (regexp-opt '("ELSE" "ELSIF") 'words) "\\)"))
 
-(defconst obn-block-end-re 
+(defconst obn-block-end-re
   (concat "^[ \t]*\\(END[ \t]*\\(;\\|$\\|(\\*\\)\\|UNTIL\\>\\)") 'words)
 
 (defconst obn-body-end-re "^[ \t]*END[ \t]+\\w")
@@ -555,7 +555,7 @@ Stores the position where the font locking should resume."
           "\\)"))
 
 (defconst obn-indentation-categories
-  (list 
+  (list
    (list obn-decl-clause-re "$" 'decl-clause)
    (list obn-module-proc-heading-re ".*\\<END[ \t]+\\w" 'module-proc)
    (list obn-begin-re ".*\\<END[ \t]+\\w" 'begin)
@@ -622,7 +622,7 @@ be indented."
                  (or current-line-p
                      (not (looking-at (nth 1 (car ls))))
                      (nth 4 (save-excursion
-                              (parse-partial-sexp (point-at-bol) 
+                              (parse-partial-sexp (point-at-bol)
                                                   (match-end 0))))))
             (setq result (nth 2 (car ls))))
         (setq ls (cdr ls)))
@@ -638,7 +638,7 @@ be indented."
 
 
 (defun obn-indentation (line)
-  (save-excursion 
+  (save-excursion
     (goto-line line)
     (current-indentation)))
 
@@ -673,7 +673,7 @@ moved to the beginning of the buffer."
 
 (defun obn-continued-balanced-line-p ()
   (let ((case-fold-search nil)
-        (re (concat "^.*\\(" 
+        (re (concat "^.*\\("
                     "\\(" obn-operator-re "\\|,\\)[ \t]*\\($\\|(\\*\\)"
                     "\\|\n[ \t]*\\(" obn-operator-re "\\|,\\)"
                     "\\|PROCEDURE[ \t]*(.+?)[ \t]*\\($\\|(\\*\\)\\)")))
@@ -682,7 +682,7 @@ moved to the beginning of the buffer."
         (obn-backward-to-code-line)
         (and (looking-at re)
              (null (nth 1 (parse-partial-sexp (point) (match-end 0))))
-             (null (nth 8 (parse-partial-sexp 
+             (null (nth 8 (parse-partial-sexp
                            (point-at-bol) (match-end 0)))))))))
 
 
@@ -730,13 +730,13 @@ return its starting point, else return nil."
 (defun obn-case-or-with-above ()
   (save-excursion
     (beginning-of-line)
-    (when (and (obn-re-search-backward 
+    (when (and (obn-re-search-backward
                 (concat "^[ \t]*\\(" obn-reserved-words-re "\\||\\).*") nil t)
                (save-match-data
-                 (string-match "\\(CASE\\|WITH\\)" 
+                 (string-match "\\(CASE\\|WITH\\)"
                                (match-string-no-properties 1)))
                (save-match-data
-                 (not (string-match "\\<END\\>" 
+                 (not (string-match "\\<END\\>"
                                     (match-string-no-properties 0)))))
       (match-beginning 1))))
 
@@ -749,17 +749,17 @@ return its starting point, else return nil."
         0
       (let* ((ref-line (obn-reference-line))
              (ref-category (obn-indent-category ref-line nil))
-             (current-category (obn-indent-category 
+             (current-category (obn-indent-category
 				(obn-line-number-at-pos) t))
              (unbalanced-paren (obn-previous-unbalanced-paren))
              (proc-heading-beneath (obn-proc-heading-beneath))
              (case-or-with-above (obn-case-or-with-above)))
-        
-        (cond 
+
+        (cond
          ;; Continued line with unbalanced parentheses
          ((not (null unbalanced-paren))
           (+ (obn-column unbalanced-paren) 1))
-         
+
          ;; Continued line with balanced parentheses
          ((obn-continued-balanced-line-p)
           (if (or (eq ref-category 'block-begin)
@@ -767,25 +767,25 @@ return its starting point, else return nil."
                   (eq ref-category 'module-proc))
               (+ (obn-indentation ref-line) (* 2 oberon-indent-level))
             (+ (obn-indentation ref-line) oberon-indent-level)))
-         
+
          ;; Single line comment before a procedure (special case)
          ((and (looking-at "^[ \t]*(\\*") proc-heading-beneath)
           (obn-column proc-heading-beneath))
-         
+
          ;; First CASE/WITH clause are indented by two blanks (special case)
          (case-or-with-above
           (cond ((looking-at "^[ \t]*\\(|\\|\\<\\(ELSE\\|END\\)\\>\\)")
                  (obn-column case-or-with-above))
                 ((looking-at "[[:word:].,'\" \t]+:[^=]")
                  (+ (obn-column case-or-with-above) 2))
-                (t (+ (obn-column case-or-with-above) 
+                (t (+ (obn-column case-or-with-above)
                       oberon-indent-level))))
-         
+
          ;; The "normal" case
          (t (+ (obn-indentation ref-line)
                (* (obn-indent-factor ref-category current-category)
                   oberon-indent-level))))))))
-  
+
 
 (defun oberon-indent-line ()
   (interactive)
@@ -800,8 +800,8 @@ return its starting point, else return nil."
 (defvar oberon-mode-abbrev-table nil
   "abbreviation table in use in Oberon mode buffers")
 
-(define-abbrev-table 'oberon-mode-abbrev-table 
-  (mapcar `(lambda (x) 
+(define-abbrev-table 'oberon-mode-abbrev-table
+  (mapcar `(lambda (x)
              (list (downcase x) x ,(when oberon-auto-indent-flag
                                      '(quote indent-according-to-mode))))
           (append obn-reserved-words obn-basic-types obn-pre-decl-const)))
@@ -810,7 +810,7 @@ return its starting point, else return nil."
   "Inhibit upcase conversion under certain circumstances.
 Inhibits expansion of the word left of point if
 
-   * word is not lowercase or 
+   * word is not lowercase or
    * word is inside a string or comment or
 
 See also `pre-abbrev-expand-hook'."
@@ -820,7 +820,7 @@ See also `pre-abbrev-expand-hook'."
                   (backward-word 1)     ;      ^                 ^
                   (re-search-forward "\\w+" p)
                   (match-string-no-properties 0)))))
-    (when (null local-abbrev-table) 
+    (when (null local-abbrev-table)
       (setq local-abbrev-table oberon-mode-abbrev-table))
     (when (or (not (string= word (downcase word)))
               (save-excursion           ;..."of"... => ..."of";...
@@ -865,18 +865,18 @@ do nothing. Always returns t."
   (let* ((parse-res (parse-partial-sexp (point-min) (point)))
          (nesting (nth 4 parse-res))
          (trailing-comment (obn-trailing-comment-p parse-res)))
-    (when nesting 
+    (when nesting
       (save-restriction
-        (narrow-to-region 
+        (narrow-to-region
          (save-excursion (goto-char (nth 8 parse-res)) (point-at-bol))
          (obn-end-of-comment nesting))
         (when trailing-comment
-          (save-excursion 
+          (save-excursion
             (goto-char (nth 8 parse-res))
             (split-line)
             (split-line)))
         (let ((fill-paragraph-function nil)
-              (left-margin (save-excursion (goto-char (nth 8 parse-res)) 
+              (left-margin (save-excursion (goto-char (nth 8 parse-res))
                                            (current-column))))
           (fill-paragraph arg))
         (when trailing-comment
@@ -886,13 +886,13 @@ do nothing. Always returns t."
             (replace-match ""))))))
   t)
 
-        
+
 ;; --- Imenu ---
 
-(defvar obn-imenu-generic-expression 
+(defvar obn-imenu-generic-expression
   (list
    (list
-    nil 
+    nil
     (concat "^ \\{0," (number-to-string oberon-indent-level) "\\}"
             "\\<PROCEDURE\\s-*\\(\\((.*?)\\s-*\\)?\\w+[ \t]*\\*?\\)")
     1))
@@ -904,7 +904,7 @@ do nothing. Always returns t."
 (defun oberon-trim-enumeration (start-value)
   "Assign consecutive integers to (enumeration) constants in region.
 The first constant gets the value START-VALUE."
-  (interactive 
+  (interactive
    (list (string-to-number
           (read-string "Enumeration start value (default 0): " nil nil "0"))))
   (let ((start (region-beginning))
@@ -956,9 +956,9 @@ at point."
   (interactive "sProcedure name: \nsReciever type name (default none): ")
   (let ((reciever "self"))
     (insert "PROCEDURE ")
-    (when (not (string-equal reciever-type "")) 
+    (when (not (string-equal reciever-type ""))
       (if (save-excursion              ;pointer or reference reciever?
-            (obn-re-search-backward 
+            (obn-re-search-backward
              (concat "\\<" reciever-type "\\>\\s-*=\\s-*RECORD\\>") nil t))
           (insert (concat "(VAR " reciever ": " reciever-type ") "))
         (insert (concat "(" reciever ": " reciever-type ") "))))
@@ -995,7 +995,7 @@ Key bindings:
 
   ;; Indentation
   (set (make-local-variable 'indent-line-function) 'oberon-indent-line)
-  
+
   ;; Font Lock
   (setq font-lock-defaults (list obn-font-lock-keywords))
 
