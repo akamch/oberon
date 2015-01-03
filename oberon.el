@@ -64,10 +64,6 @@
 ;;
 ;;      PROCEDURE P; BEGIN END P;
 
-;;; History:
-
-;; See `oberon.el.changelog'.
-
 ;;; Code:
 
 (require 'font-lock)
